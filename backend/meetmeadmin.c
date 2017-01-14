@@ -13,11 +13,12 @@
 #include <sys/stat.h>
 
 /* --- Konstanten zum Auffinden der Asterisk-Dateien --- */
-#define ASTBIN  "/opt/asterisk/sbin/asterisk"
-#define ASTMEET "/opt/asterisk/etc/asterisk/meetme.conf"
-#define ASTICE  "/opt/asterisk/ices"
-#define ASTOUT  "/opt/asterisk/var/spool/asterisk/outgoing"
-#define ASTMON  "/opt/asterisk/var/spool/asterisk/monitor"
+#define ASTBIN  "/usr/sbin/asterisk"
+#define ASTMEET "/etc/asterisk/meetme.conf"
+#define ASTICE  "/var/www/asterisk/cgi-bin/ices"
+#define ASTOUT  "/var/spool/asterisk/outgoing"
+#define ASTMON  "/var/spool/asterisk/monitor"
+#define ASTLOG  "/var/log/asterisk"
 #define ICEPWD  "***passwort***"
 
 /* --- Ein Buffer zum Einlesen einer Zeile --- */
@@ -157,11 +158,11 @@ void Stream(int iRoom)
    /* --- ices2-Konfiguration aufbauen --- */
    sprintf(wBuf,"%s/raum%04i.xml",ASTICE,iRoom);
    if ((f=fopen(wBuf,"w"))==NULL) return;
-   chmod(wBuf,S_IREAD|S_IWRITE);
+   chmod(wBuf,S_IREAD|S_IWRITE|S_IRGRP|S_IWGRP);
    fprintf(f,"<?xml version=\"1.0\"?>\n");
    fprintf(f,"<ices>\n");
    fprintf(f,"  <background>0</background>\n");
-   fprintf(f,"  <logpath>/opt/asterisk/var/log/asterisk</logpath>\n");
+   fprintf(f,"  <logpath>%s</logpath>\n", ASTLOG);
    fprintf(f,"  <logfile>ices.log</logfile>\n");
    fprintf(f,"  <loglevel>1</loglevel>\n");
    fprintf(f,"  <consolelog>0</consolelog>\n");
@@ -197,6 +198,7 @@ void Stream(int iRoom)
    /* --- Asterisk Call File aufbauen --- */
    sprintf(wBuf,"%s/raum%04i.call",ASTOUT,iRoom);
    if ((f=fopen(wBuf,"w"))==NULL) return;
+   chmod(wBuf,S_IREAD|S_IWRITE|S_IRGRP|S_IWGRP);
    fprintf(f,"Channel: LOCAL/81%04i\n",iRoom);
    fprintf(f,"MaxRetries: 1\n");
    fprintf(f,"RetryTime: 15\n");
@@ -220,12 +222,13 @@ void Record(int iRoom)
    /* --- Asterisk Call File aufbauen --- */
    sprintf(wBuf,"%s/raum%04i.call",ASTOUT,iRoom);
    if ((f=fopen(wBuf,"w"))==NULL) return;
+   chmod(wBuf,S_IREAD|S_IWRITE|S_IRGRP|S_IWGRP);
    fprintf(f,"Channel: LOCAL/81%04i\n",iRoom);
    fprintf(f,"MaxRetries: 1\n");
    fprintf(f,"RetryTime: 15\n");
    fprintf(f,"WaitTime: 30\n");
    fprintf(f,"Application: Record\n");
-   fprintf(f,"Data: %s/raum%04i.gsm|0|18000|x\n",ASTMON,iRoom);
+   fprintf(f,"Data: %s/raum%04i.gsm,0,18000,x\n",ASTMON,iRoom);
    fprintf(f,"Callerid: Record <0>\n");
    fprintf(f,"AlwaysDelete: Yes\n");
    fclose(f);
