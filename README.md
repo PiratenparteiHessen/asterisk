@@ -9,3 +9,9 @@ Im Zuge einer Migration des Dienstes Anfang 2017 wurde das Administrationsinterf
 
 ## Wiki
 Weitere Details finden sich im [Wiki](https://wiki.piratenpartei.de/HE:Telefonkonferenz) der Piratenpartei.
+
+## Schreibrechte (sudo)
+Damit das meetmeadmin.cgi (www-data) via meetmeadmin unter /var/asterisk/spool Schreibrechte als User asterisk erhält, ist eine Anpassung von /etc/sudoers notwendig:
+
+    Defaults:www-data !requiretty
+    www-data ALL=(asterisk) NOPASSWD: /usr/local/bin/meetmeadmin

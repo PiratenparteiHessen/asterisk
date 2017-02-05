@@ -9,7 +9,7 @@
 # Lizenz: CC-BY
 
 
-ADMINBIN=/usr/local/bin/meetmeadmin
+ADMINBIN='sudo -u asterisk /usr/local/bin/meetmeadmin'
 
 p_loginform()
 {
